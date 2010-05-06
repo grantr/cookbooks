@@ -66,6 +66,22 @@ directory app['deploy_to'] do
   recursive true
 end
 
+# put deploy_to on /mnt if running on ec2
+if node[:ec2]
+  directory "/mnt/#{app['id']}" do
+    owner app['owner']
+    group app['group']
+    mode 0755
+  end
+
+  mount app['deploy_to'] do
+    device "/mnt/#{app['id']}"
+    fstype "none"
+    options "bind,rw"
+    action :mount
+  end
+end
+
 directory "#{app['deploy_to']}/shared" do
   owner app['owner']
   group app['group']
